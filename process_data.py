@@ -1,9 +1,7 @@
-from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
 
 def ProcessData():
     data = pd.read_csv("train.csv")
@@ -22,8 +20,6 @@ def ProcessData():
 
     X = X.replace('A', PRE('A'))
     X = X.replace('B', PRE('B'))
-
-    print(X.isnull().sum())
 
     # Obtaining test and training sets
     X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.5,shuffle=False)
