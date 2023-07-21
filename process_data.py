@@ -60,8 +60,8 @@ def getMultiClassData():
     for c in classes:
         y = y.replace(c, classes[c])
     
-    X = X.replace('A', PRE('A', data))
-    X = X.replace('B', PRE('B', data))
+    X = X.replace('A', CFE('A', 'EJ', data))
+    X = X.replace('B', CFE('B', 'EJ', data))
     
     return SplitShapeData(X, y)
 
@@ -79,13 +79,12 @@ def getExperimentalData():
     y = y.replace({'A': 0, 'B': 1, 'D': 2, 'G': 3})
     data = pd.concat([data, greeks], axis=1)
     
-    # 
     beta_dict = {x: CFE(x, 'Beta', data) for x in data['Beta'].unique()}
     gamma_dict = {x: CFE(x, 'Gamma', data) for x in data['Gamma'].unique()}
     delta_dict = {x: CFE(x, 'Delta', data) for x in data['Delta'].unique()}
 
     X = X.replace({'Beta': beta_dict, 'Gamma': gamma_dict, 'Delta': delta_dict})
-    X = X.replace('A', PRE('A', data))
-    X = X.replace('B', PRE('B', data))
+    X = X.replace('A', CFE('A', 'EJ', data))
+    X = X.replace('B', CFE('B', 'EJ', data))
     
     return SplitShapeData(X, y)
