@@ -1,4 +1,3 @@
-from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -81,7 +80,6 @@ def getExperimentalData():
     experimental = greeks.iloc[:,2:5]
 
     X = pd.concat([X, experimental], axis=1)
-
     y = y.replace({'A': 0, 'B': 1, 'D': 2, 'G': 3})
     data = pd.concat([data, greeks], axis=1)
     
@@ -102,7 +100,6 @@ def getBinaryClassWeights():
     data = pd.read_csv("train.csv")
     neg, pos = np.bincount(data['Class'])
     total = neg + pos
-
     neg_weight = (1 / neg) * (total / 2.0)
     pos_weight = (1 / pos) * (total / 2.0)
 
