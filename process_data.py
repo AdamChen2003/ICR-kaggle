@@ -15,9 +15,7 @@ def PRE(val, data):
 
 # Count/Frequency encoding for categorical features in multi-class classification
 def CFE(val, feature, data):
-    count = len(data[data[feature] == val])
-    print(f"{feature}: {val} -> {count}")
-    return count
+    return len(data[data[feature] == val])
     
 # Normalizing data (Note that we scale the training and test set separately)
 def Normalize(X):
@@ -42,8 +40,6 @@ def ProcessData():
     # Obtain X and y
     X = data.iloc[:,1:57]
     y = data.iloc[:,57]
-
-    print(X.isnull().sum())
     
     X = X.replace('A', PRE('A', data))
     X = X.replace('B', PRE('B', data))
@@ -91,9 +87,6 @@ def getExperimentalData():
     gamma_indicators = pd.get_dummies(data['Gamma'])
     EJ_indicator = pd.get_dummies(data['EJ'], prefix="EJ: ", drop_first=True)
     
-    print(gamma_indicators)
-    print(EJ_indicator)
-    
     X = X.replace({'Beta': beta_dict, 'Delta': delta_dict})
     X = pd.concat([X, gamma_indicators], axis=1)
     X = pd.concat([X, EJ_indicator], axis=1)
@@ -101,6 +94,3 @@ def getExperimentalData():
     X.drop('EJ', axis=1, inplace=True)
     
     return SplitShapeData(X, y)
-
-X_train,_,_,_ = getMultiClassData()
-print(X_train.shape)
