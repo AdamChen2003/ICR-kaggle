@@ -17,25 +17,11 @@ def CFE(val, feature, data):
     return len(data[data[feature] == val])
     
 # Normalizing data
-def Normalize(X, x):
-    scaler = StandardScaler().fit(X)
-    return scaler.transform(x)
-
-# def SplitShapeData(X, y, k):
-#     kFold = StratifiedKFold(n_splits=4,shuffle=True)
-#     for item in kFold.split(X,y):
-#         print(item)
-
-#     # Obtaining test and training sets
-#     X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.5,shuffle=False)
-
-#     # Replace missing values with 0 and convert dataframe to numpy array
-#     X_train = np.nan_to_num(np.array(Normalize(X_train)))
-#     X_test = np.nan_to_num(np.array(Normalize(X_test)))
-#     y_train = np.array(y_train).reshape(-1,1)
-#     y_test = np.array(y_test).reshape(-1,1)
-
-#     return X_train,X_test,y_train,y_test
+def Normalize(X_train, X_test):
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    return X_train, X_test
     
 def getBinaryClassData():
     data = pd.read_csv("train.csv")
