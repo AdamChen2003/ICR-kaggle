@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
-    
     t = len(data[(data['EJ'] == val) & (data['Class'] == 1)])
     f = len(data[(data['EJ'] == val) & (data['Class'] == 0)])
     if f:
@@ -16,7 +15,6 @@ def PRE(val, data):
 def CFE(val, feature, data):
     return len(data[data[feature] == val])
     
-# Normalizing data
 def Normalize(X_train, X_test):
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
@@ -33,7 +31,7 @@ def getBinaryClassData():
     X = X.replace('A', PRE('A', data))
     X = X.replace('B', PRE('B', data))
     
-    return np.array(X),np.array(y).reshape(-1,1)
+    return np.array(X), np.array(y).reshape(-1,1)
 
 def getMultiClassData():
     data = pd.read_csv("train.csv")
@@ -54,7 +52,7 @@ def getMultiClassData():
     X = pd.concat([X, EJ_indicator], axis=1)
     X.drop('EJ', axis=1, inplace=True)
 
-    return np.array(X),np.array(y).reshape(-1,1)
+    return np.array(X), np.array(y).reshape(-1,1)
 
 def getExperimentalData():
     data = pd.read_csv("train.csv")
@@ -80,15 +78,12 @@ def getExperimentalData():
     X.drop('Gamma', axis=1, inplace=True)
     X.drop('EJ', axis=1, inplace=True)
     
-    return np.array(X),np.array(y).reshape(-1,1)
+    return np.array(X), np.array(y).reshape(-1,1)
 
 def getBinaryClassWeights():
-    data = pd.read_csv("train.csv")
-    neg, pos = np.bincount(data['Class'])
-    total = neg + pos
-    neg_weight = (1 / neg) * (total / 2.0)
-    pos_weight = (1 / pos) * (total / 2.0)
+    _, y = getBinaryClassData()
+    return {x: len(y) / (2 * len(y[y == x])) for x in np.unique(y)}
 
-    return {0:neg_weight, 1:pos_weight}
-
-# def getMultiClassWeights():
+def getMultiClassWeights():
+    _, y = getMultiClassData()
+    return {x: len(y) / (4 * len(y[y == x])) for x in np.unique(y)}
