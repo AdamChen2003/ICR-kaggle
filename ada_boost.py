@@ -1,26 +1,31 @@
+from statistics import stdev
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import metrics
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
-from process_data import ProcessData
+from sklearn.model_selection import StratifiedKFold
+from process_data import getBinaryClassData, Normalize, getBinaryClassWeights
 
-X_train,X_test,y_train,y_test = ProcessData()
+X,y = getBinaryClassData()
 
+skf = StratifiedKFold(n_splits=5,shuffle=True)
 model = AdaBoostClassifier(
-            estimator=
-            DecisionTreeClassifier(max_depth=1, criterion='entropy'),
-            n_estimators=1000)
-model.fit(X_train, y_train)
-score = model.score(X_test, y_test.ravel())
-pred = model.predict(X_test)
+                estimator=
+                DecisionTreeClassifier(max_depth=1, criterion='entropy',class_weight=getBinaryClassWeights()),
+                n_estimators=1000)
 
-cm = metrics.confusion_matrix(y_test, pred)
-plt.figure(figsize=(9,9))
-sns.heatmap(cm, annot=True, fmt=".3f", linewidths=.5, square = True, cmap = 'Blues_r')
-plt.ylabel('Actual label')
-plt.xlabel('Predicted label')
-all_sample_title = 'Accuracy Score: {0}'.format(score)
-plt.title(all_sample_title, size = 15)
-plt.show()
+scores = []
+for train_index, test_index in skf.split(X,y):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    X_train = np.nan_to_num(Normalize(X_train, X_train))
+    X_test = np.nan_to_num(Normalize(X_train, X_test))
+    model.fit(X_train, y_train.ravel())
+    scores.append(model.score(X_test, y_test.ravel()))
+
+print(f'Maximum Accuracy Score: {max(scores)}')
+print(f'Minimum Accuracy Score: {min(scores)}')
+print(f'Mean Accuracy Score: {np.mean(scores)}')
+print(f'Standard Deviation: {stdev(scores)}')

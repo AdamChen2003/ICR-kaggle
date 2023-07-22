@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
     
@@ -17,24 +17,28 @@ def PRE(val, data):
 def CFE(val, feature, data):
     return len(data[data[feature] == val])
     
-# Normalizing data (Note that we scale the training and test set separately)
-def Normalize(X):
+# Normalizing data
+def Normalize(X, x):
     scaler = StandardScaler().fit(X)
-    return scaler.transform(X)
+    return scaler.transform(x)
 
-def SplitShapeData(X, y):
-    # Obtaining test and training sets
-    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.5,shuffle=False)
+# def SplitShapeData(X, y, k):
+#     kFold = StratifiedKFold(n_splits=4,shuffle=True)
+#     for item in kFold.split(X,y):
+#         print(item)
 
-    # Replace missing values with 0 and convert dataframe to numpy array
-    X_train = np.nan_to_num(np.array(Normalize(X_train)))
-    X_test = np.nan_to_num(np.array(Normalize(X_test)))
-    y_train = np.array(y_train).reshape(-1,1)
-    y_test = np.array(y_test).reshape(-1,1)
+#     # Obtaining test and training sets
+#     X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.5,shuffle=False)
 
-    return X_train,X_test,y_train,y_test
+#     # Replace missing values with 0 and convert dataframe to numpy array
+#     X_train = np.nan_to_num(np.array(Normalize(X_train)))
+#     X_test = np.nan_to_num(np.array(Normalize(X_test)))
+#     y_train = np.array(y_train).reshape(-1,1)
+#     y_test = np.array(y_test).reshape(-1,1)
+
+#     return X_train,X_test,y_train,y_test
     
-def ProcessData():
+def getBinaryClassData():
     data = pd.read_csv("train.csv")
 
     # Obtain X and y
@@ -44,7 +48,7 @@ def ProcessData():
     X = X.replace('A', PRE('A', data))
     X = X.replace('B', PRE('B', data))
     
-    return SplitShapeData(X, y)
+    return np.array(X),np.array(y).reshape(-1,1)
 
 def getMultiClassData():
     data = pd.read_csv("train.csv")
@@ -58,15 +62,14 @@ def getMultiClassData():
     for c in classes:
         y = y.replace(c, classes[c])
         
-        
     # Using One Hot encoding since there are only two nomial categories for EJ
     # i.e. will not increase dimensionality    
     EJ_indicator = pd.get_dummies(data['EJ'], prefix="EJ: ", drop_first=True)
     
     X = pd.concat([X, EJ_indicator], axis=1)
     X.drop('EJ', axis=1, inplace=True)
-    
-    return SplitShapeData(X, y)
+
+    return np.array(X),np.array(y).reshape(-1,1)
 
 def getExperimentalData():
     data = pd.read_csv("train.csv")
@@ -93,4 +96,16 @@ def getExperimentalData():
     X.drop('Gamma', axis=1, inplace=True)
     X.drop('EJ', axis=1, inplace=True)
     
-    return SplitShapeData(X, y)
+    return np.array(X),np.array(y).reshape(-1,1)
+
+def getBinaryClassWeights():
+    data = pd.read_csv("train.csv")
+    neg, pos = np.bincount(data['Class'])
+    total = neg + pos
+
+    neg_weight = (1 / neg) * (total / 2.0)
+    pos_weight = (1 / pos) * (total / 2.0)
+
+    return {0:neg_weight, 1:pos_weight}
+
+# def getMultiClassWeights():
