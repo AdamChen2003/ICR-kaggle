@@ -15,7 +15,9 @@ def PRE(val, data):
 
 # Count/Frequency encoding for categorical features in multi-class classification
 def CFE(val, feature, data):
-    return len(data[data[feature] == val])
+    count = len(data[data[feature] == val])
+    print(f"{feature}: {val} -> {count}")
+    return count
     
 # Normalizing data (Note that we scale the training and test set separately)
 def Normalize(X):
@@ -59,9 +61,14 @@ def getMultiClassData():
     
     for c in classes:
         y = y.replace(c, classes[c])
+        
+        
+    # Using One Hot encoding since there are only two nomial categories for EJ
+    # i.e. will not increase dimensionality    
+    EJ_indicator = pd.get_dummies(data['EJ'], prefix="EJ: ", drop_first=True)
     
-    X = X.replace('A', CFE('A', 'EJ', data))
-    X = X.replace('B', CFE('B', 'EJ', data))
+    X = pd.concat([X, EJ_indicator], axis=1)
+    X.drop('EJ', axis=1, inplace=True)
     
     return SplitShapeData(X, y)
 
@@ -80,11 +87,20 @@ def getExperimentalData():
     data = pd.concat([data, greeks], axis=1)
     
     beta_dict = {x: CFE(x, 'Beta', data) for x in data['Beta'].unique()}
-    gamma_dict = {x: CFE(x, 'Gamma', data) for x in data['Gamma'].unique()}
     delta_dict = {x: CFE(x, 'Delta', data) for x in data['Delta'].unique()}
-
-    X = X.replace({'Beta': beta_dict, 'Gamma': gamma_dict, 'Delta': delta_dict})
-    X = X.replace('A', CFE('A', 'EJ', data))
-    X = X.replace('B', CFE('B', 'EJ', data))
+    gamma_indicators = pd.get_dummies(data['Gamma'])
+    EJ_indicator = pd.get_dummies(data['EJ'], prefix="EJ: ", drop_first=True)
+    
+    print(gamma_indicators)
+    print(EJ_indicator)
+    
+    X = X.replace({'Beta': beta_dict, 'Delta': delta_dict})
+    X = pd.concat([X, gamma_indicators], axis=1)
+    X = pd.concat([X, EJ_indicator], axis=1)
+    X.drop('Gamma', axis=1, inplace=True)
+    X.drop('EJ', axis=1, inplace=True)
     
     return SplitShapeData(X, y)
+
+X_train,_,_,_ = getMultiClassData()
+print(X_train.shape)
