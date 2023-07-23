@@ -1,12 +1,10 @@
-from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
-    
     t = len(data[(data['EJ'] == val) & (data['Class'] == 1)])
     f = len(data[(data['EJ'] == val) & (data['Class'] == 0)])
     if f:
@@ -17,24 +15,13 @@ def PRE(val, data):
 def CFE(val, feature, data):
     return len(data[data[feature] == val])
     
-# Normalizing data (Note that we scale the training and test set separately)
-def Normalize(X):
-    scaler = StandardScaler().fit(X)
-    return scaler.transform(X)
-
-def SplitShapeData(X, y):
-    # Obtaining test and training sets
-    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.5,shuffle=False)
-
-    # Replace missing values with 0 and convert dataframe to numpy array
-    X_train = np.nan_to_num(np.array(Normalize(X_train)))
-    X_test = np.nan_to_num(np.array(Normalize(X_test)))
-    y_train = np.array(y_train).reshape(-1,1)
-    y_test = np.array(y_test).reshape(-1,1)
-
-    return X_train,X_test,y_train,y_test
+def Normalize(X_train, X_test):
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    return X_train, X_test
     
-def ProcessData():
+def getBinaryClassData():
     data = pd.read_csv("train.csv")
 
     # Obtain X and y
@@ -44,7 +31,7 @@ def ProcessData():
     X = X.replace('A', PRE('A', data))
     X = X.replace('B', PRE('B', data))
     
-    return SplitShapeData(X, y)
+    return np.array(X), np.array(y).reshape(-1,1)
 
 def getMultiClassData():
     data = pd.read_csv("train.csv")
@@ -58,15 +45,14 @@ def getMultiClassData():
     for c in classes:
         y = y.replace(c, classes[c])
         
-        
     # Using One Hot encoding since there are only two nomial categories for EJ
     # i.e. will not increase dimensionality    
     EJ_indicator = pd.get_dummies(data['EJ'], prefix="EJ: ", drop_first=True)
     
     X = pd.concat([X, EJ_indicator], axis=1)
     X.drop('EJ', axis=1, inplace=True)
-    
-    return SplitShapeData(X, y)
+
+    return np.array(X), np.array(y).reshape(-1,1)
 
 def getExperimentalData():
     data = pd.read_csv("train.csv")
@@ -78,7 +64,6 @@ def getExperimentalData():
     experimental = greeks.iloc[:,2:5]
 
     X = pd.concat([X, experimental], axis=1)
-
     y = y.replace({'A': 0, 'B': 1, 'D': 2, 'G': 3})
     data = pd.concat([data, greeks], axis=1)
     
@@ -93,4 +78,12 @@ def getExperimentalData():
     X.drop('Gamma', axis=1, inplace=True)
     X.drop('EJ', axis=1, inplace=True)
     
-    return SplitShapeData(X, y)
+    return np.array(X), np.array(y).reshape(-1,1)
+
+def getBinaryClassWeights():
+    _, y = getBinaryClassData()
+    return {x: len(y) / (2 * len(y[y == x])) for x in np.unique(y)}
+
+def getMultiClassWeights():
+    _, y = getMultiClassData()
+    return {x: len(y) / (4 * len(y[y == x])) for x in np.unique(y)}
