@@ -22,7 +22,7 @@ def Normalize(X_train, X_test):
     return X_train, X_test
     
 def getBinaryClassData():
-    data = pd.read_csv("train.csv")
+    data = pd.read_csv("datasets/train.csv")
 
     # Obtain X and y
     X = data.iloc[:,1:57]
@@ -34,8 +34,8 @@ def getBinaryClassData():
     return np.array(X), np.array(y).reshape(-1,1)
 
 def getMultiClassData():
-    data = pd.read_csv("train.csv")
-    greeks = pd.read_csv("greeks.csv")
+    data = pd.read_csv("datasets/train.csv")
+    greeks = pd.read_csv("datasets/greeks.csv")
     
     classes = {'A': 0, 'B': 1, 'D': 2, 'G': 3}
     # Obtain X and y
@@ -55,8 +55,8 @@ def getMultiClassData():
     return np.array(X), np.array(y).reshape(-1,1)
 
 def getExperimentalData():
-    data = pd.read_csv("train.csv")
-    greeks = pd.read_csv("greeks.csv")
+    data = pd.read_csv("datasets/train.csv")
+    greeks = pd.read_csv("datasets/greeks.csv")
     
     # Obtain X and y
     X = data.iloc[:,1:57]
