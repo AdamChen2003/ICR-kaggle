@@ -4,7 +4,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import f1_score
 from process_data import Normalize
 
-def EvaluateModel(X, y, model):
+def EvaluateModel(X, y, model, multiclass=False):
     skf = StratifiedKFold(n_splits=5,shuffle=True)
     scores = []
     f1_scores = []
@@ -16,7 +16,11 @@ def EvaluateModel(X, y, model):
         X_test = np.nan_to_num(X_test)
         model.fit(X_train, y_train.ravel())
         scores.append(model.score(X_test, y_test.ravel()))
-        f1_scores.append(f1_score(y_test, model.predict(X_test), average='micro'))
+        if multiclass:
+            pred = model.predict(X_test)
+            f1_scores.append(f1_score(np.where(y_test > 0, 1, y_test), np.where(pred > 0, 1, pred), average='micro'))
+        else:
+            f1_scores.append(f1_score(y_test, model.predict(X_test), average='micro'))
 
     print(f'Maximum Accuracy Score: {max(scores)}')
     print(f'Minimum Accuracy Score: {min(scores)}')
