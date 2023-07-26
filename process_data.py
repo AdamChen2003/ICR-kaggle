@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
 
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
@@ -80,10 +79,8 @@ def getExperimentalData():
     
     return np.array(X), np.array(y).reshape(-1,1)
 
-def getBinaryClassWeights():
-    _, y = getBinaryClassData()
+def getBinaryClassWeights(y):
     return {x: len(y) / (2 * len(y[y == x])) for x in np.unique(y)}
 
-def getMultiClassWeights():
-    _, y = getMultiClassData()
+def getMultiClassWeights(y):
     return {x: len(y) / (4 * len(y[y == x])) for x in np.unique(y)}
