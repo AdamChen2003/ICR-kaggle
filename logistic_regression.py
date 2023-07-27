@@ -1,7 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, train_test_split
-from process_data import getBinaryClassData, getBinaryClassWeights, Normalize
+from process_data import getBinaryClassData, Normalize
+from evaluate_model import EvaluateModel
 from imblearn.over_sampling import SMOTE
 
 X,y = getBinaryClassData()
@@ -14,15 +18,10 @@ X_test = np.nan_to_num(X_test)
 grid = {
     'C': [0.5,1.0,1.5],
     'fit_intercept': [True,False],
-    'class_weight': [getBinaryClassWeights(y_train), None]
+    'class_weight': ['balanced', None]
 }
 
-cv = GridSearchCV(estimator=LogisticRegression(), param_grid=grid, cv= 5)
-cv.fit(X_train, y_train.ravel())
-print(cv.best_params_)
-print(cv.best_score_)
-print(cv.best_estimator_.score(X_test, y_test.ravel()))
-
+EvaluateModel(X_train, y_train, X_test, y_test, LogisticRegression(), grid)
 
 # Oversampling
 oversample = SMOTE()
@@ -33,8 +32,4 @@ grid = {
     'fit_intercept': [True,False]
 }
 
-cv = GridSearchCV(estimator=LogisticRegression(), param_grid=grid, cv= 5)
-cv.fit(X_train, y_train.ravel())
-print(cv.best_params_)
-print(cv.best_score_)
-print(cv.best_estimator_.score(X_test, y_test.ravel()))
+EvaluateModel(X_train, y_train, X_test, y_test, LogisticRegression(), grid)
