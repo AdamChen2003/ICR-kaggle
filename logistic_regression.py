@@ -13,7 +13,7 @@ X_train = np.nan_to_num(X_train)
 X_test = np.nan_to_num(X_test)
 model = LogisticRegression(random_state=1)
 
-# Class Weights
+# No sampling/Class Weights
 grid = {
     'C': [0.5,0.75,1.0,1.25,1.5],
     'fit_intercept': [True,False],
