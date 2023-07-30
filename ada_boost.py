@@ -22,7 +22,7 @@ for i in [1,2,3]:
 
 grid = {
     'estimator': base_models,
-    'n_estimators': [200,500,1000]
+    'n_estimators': [250,500,750,1000]
 }
 
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
@@ -33,7 +33,7 @@ X_train, y_train = oversample.fit_resample(X_train, y_train)
 
 grid = {
     'estimator': base_models,
-    'n_estimators': [200,500,1000]
+    'n_estimators': [250,500,750,1000]
 }
 
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
