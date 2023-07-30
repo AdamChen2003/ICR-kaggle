@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
@@ -79,8 +81,19 @@ def getExperimentalData():
     
     return np.array(X), np.array(y).reshape(-1,1)
 
-def getBinaryClassWeights(y):
-    return {x: len(y) / (2 * len(y[y == x])) for x in np.unique(y)}
+def pca(X):
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+    X = np.nan_to_num(X)
+    # pca = PCA(n_components=56)
+    # pca.fit(X)
+    # var=np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4)*100)
+    # plt.plot(var)
+    # print(var)
+    # plt.show()
+    pca = PCA(n_components=40)
+    pca.fit(X)
+    return pca.fit_transform(X)
 
-def getMultiClassWeights(y):
-    return {x: len(y) / (4 * len(y[y == x])) for x in np.unique(y)}
+
+pca(getBinaryClassData()[0])

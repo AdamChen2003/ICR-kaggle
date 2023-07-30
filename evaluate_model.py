@@ -17,4 +17,4 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid):
     plt.xlabel('Predicted label');
     all_sample_title = 'Accuracy Score: {0}'.format(score)
     plt.title(all_sample_title, size = 15)
-    plt.show()
+    # plt.show()
