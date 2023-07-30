@@ -12,9 +12,9 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid):
     print(score)
     plt.figure(figsize=(9,9))
     cm = metrics.confusion_matrix(y_test, cv.best_estimator_.predict(X_test))
-    sns.heatmap(cm, annot=True, fmt=".3f", linewidths=.5, square = True, cmap = 'Blues_r');
-    plt.ylabel('Actual label');
-    plt.xlabel('Predicted label');
+    sns.heatmap(cm, annot=True, fmt=".3f", linewidths=.5, square = True, cmap = 'Blues_r')
+    plt.ylabel('Actual label')
+    plt.xlabel('Predicted label')
     all_sample_title = 'Accuracy Score: {0}'.format(score)
     plt.title(all_sample_title, size = 15)
     # plt.show()
