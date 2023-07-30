@@ -11,7 +11,7 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid):
     print(f"best score on training set: {cv.best_score_}")
     print(f"best model accuracy on test set: {score}")
     print(f"f1 score: {f1_score(cv.best_estimator_.predict(X_test), y_test.ravel())}")
-    print(f"f2 score: {fbeta_score(cv.best_estimator_.predict(X_test), y_test.ravel())}")
+    print(f"f2 score: {fbeta_score(cv.best_estimator_.predict(X_test), y_test.ravel(), beta=2)}")
 
     plt.figure(figsize=(9,9))
     cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))
