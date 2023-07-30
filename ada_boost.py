@@ -16,9 +16,10 @@ model = AdaBoostClassifier(random_state=1)
 
 # No sampling
 base_models = []
-
 for i in [1,2,3]:
-    base_models.append(DecisionTreeClassifier(max_depth=1, criterion='entropy'))
+    for criteria in ['gini', 'entropy', 'log_loss']:
+        base_models.append(DecisionTreeClassifier(max_depth=i, criterion=criteria))
+        base_models.append(DecisionTreeClassifier(max_depth=i, criterion=criteria,class_weight='balanced'))
 
 grid = {
     'estimator': base_models,
@@ -28,6 +29,11 @@ grid = {
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
 
 # Oversampling
+base_models = []
+for i in [1,2,3]:
+    for criteria in ['gini', 'entropy', 'log_loss']:
+        base_models.append(DecisionTreeClassifier(max_depth=i, criterion=criteria))
+
 oversample = SMOTE()
 X_train, y_train = oversample.fit_resample(X_train, y_train)
 
