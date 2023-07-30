@@ -15,7 +15,7 @@ model = LogisticRegression(random_state=1)
 
 # No sampling/Class Weights
 grid = {
-    'C': [0.5,0.75,1.0,1.25,1.5],
+    'C': [1,0.1,0.01],
     'fit_intercept': [True,False],
     'class_weight': ['balanced', None]
 }
@@ -27,7 +27,7 @@ oversample = SMOTE()
 X_train, y_train = oversample.fit_resample(X_train, y_train)
 
 grid = {
-    'C': [0.5,0.75,1.0,1.25,1.5],
+    'C': [1,0.1,0.01],
     'fit_intercept': [True,False]
 }
 
