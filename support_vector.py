@@ -1,9 +1,6 @@
-import numpy as np
 from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-from process_data import getBinaryClassData, Normalize, pca
+from process_data import getBinaryClassData, splitTrainAndTest
 from evaluate_model import EvaluateModel
-from imblearn.over_sampling import SMOTE
 
 X,y = getBinaryClassData()
 # X = pca(X)

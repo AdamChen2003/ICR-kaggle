@@ -1,9 +1,7 @@
-import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from process_data import getBinaryClassData, Normalize
+from process_data import getBinaryClassData, splitTrainAndTest
 from evaluate_model import EvaluateModel
-from imblearn.over_sampling import SMOTE
+
 
 X,y = getBinaryClassData()
 # X = pca(X)
