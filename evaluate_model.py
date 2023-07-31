@@ -13,13 +13,15 @@ def balancedLogLoss(y_true, y_pred):
     sum0 = 0
     for i in class0:
         if y_true[i] == 0:
-            sum0 += log(1 - y_pred[i])
+            p = max(min(y_pred[i], 1-10**(-15)),10**(-15))
+            sum0 += log(1-p)
     
     class1 = np.array(np.where(y_true == 1)).ravel()
     sum1 = 0
     for i in class1:
         if y_true[i] == 1:
-            sum1 += log(y_pred[i])
+            p = max(min(y_pred[i], 1-10**(-15)),10**(-15))
+            sum1 += log(p)
     
     return -(sum0/N0 + sum1/N1)/2
 
