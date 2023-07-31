@@ -1,6 +1,6 @@
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
-from process_data import getBinaryClassData, splitTrainAndTest
+from process_data import getBinaryClassData, splitTrainAndTest, getMultiClassData
 from evaluate_model import EvaluateModel
 
 
@@ -9,7 +9,7 @@ X,y = getBinaryClassData()
 X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
 model = AdaBoostClassifier(random_state=1)
 
-# No sampling
+
 base_models = []
 for i in [1,2,3]:
     for criteria in ['gini', 'entropy', 'log_loss']:
@@ -21,17 +21,27 @@ grid = {
     'n_estimators': [50,100,250,500]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
-
-# Oversampling
-base_models = []
+base_models_os = []
 for i in [1,2,3]:
     for criteria in ['gini', 'entropy', 'log_loss']:
-        base_models.append(DecisionTreeClassifier(max_depth=i, criterion=criteria))
+        base_models_os.append(DecisionTreeClassifier(max_depth=i, criterion=criteria))
 
-grid = {
-    'classification__estimator': base_models,
+grid_os = {
+    'classification__estimator': base_models_os,
     'classification__n_estimators': [50,100,250,500]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)
+# No sampling
+# EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
+
+# Oversampling
+# EvaluateModel(X_train, y_train, X_test, y_test, model, grid_os, True)
+
+X,y = getMultiClassData()
+X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
+
+# Multi class with no sampling
+# EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False, multi=True)
+
+# Multi class with oversampling
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid_os, True, multi=True)

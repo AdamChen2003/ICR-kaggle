@@ -1,5 +1,5 @@
 from sklearn.linear_model import LogisticRegression
-from process_data import getBinaryClassData, splitTrainAndTest
+from process_data import getBinaryClassData, splitTrainAndTest, getMultiClassData
 from evaluate_model import EvaluateModel
 
 X,y = getBinaryClassData()
@@ -7,19 +7,30 @@ X,y = getBinaryClassData()
 X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
 model = LogisticRegression(random_state=1)
 
-# No sampling/Class Weights
+
 grid = {
     'C': [1,0.1,0.01],
     'fit_intercept': [True,False],
     'class_weight': ['balanced', None]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
-
-# Oversampling
-grid = {
+grid_os = {
     'classification__C': [1,0.1,0.01],
     'classification__fit_intercept': [True,False]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)
+
+# No sampling/Class Weights
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
+
+# Oversampling
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid_os, True)
+
+X,y = getMultiClassData()
+X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
+
+# Multi class with no sampling
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False, multi=True)
+
+# Multi class with oversampling
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid_os, True, multi=True)

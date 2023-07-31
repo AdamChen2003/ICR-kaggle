@@ -2,7 +2,7 @@ from math import log
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, make_scorer
+from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, make_scorer, accuracy_score
 from sklearn.model_selection import GridSearchCV
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
@@ -25,20 +25,30 @@ def balancedLogLoss(y_true, y_pred):
     
     return -(sum0/N0 + sum1/N1)/2
 
-def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling):
+def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, multi=False):
     if oversampling:
         model = Pipeline([
             ('sampling', SMOTE()),
             ('classification', model)
         ])
     # f1 = make_scorer(f1_score)
-    
     cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring=make_scorer(balancedLogLoss, needs_proba=True, greater_is_better=False))
+    if multi:
+        cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='f1_micro')
     # cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='neg_log_loss')
     cv.fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
     predictions = cv.best_estimator_.predict(X_test)
+    
+    if multi:
+        predictions[predictions > 0] = 1
+        y_test[y_test > 0] = 1
+        score = accuracy_score(y_test, predictions)
+
     proba_predictions = cv.best_estimator_.predict_proba(X_test)
+    if multi:
+        proba_predictions = np.array([[a, b + c + d] for a, b, c, d in proba_predictions])
+
     print(f'Best parameters: {cv.best_params_}')
     print(f'accuracy: {score}')
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
