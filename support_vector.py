@@ -26,10 +26,10 @@ EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 
 # Oversampling
 grid = {
-    'C': [0.1, 1, 10, 100, 1000],
-    'gamma': [1, 0.1, 0.01, 0.001, 0.0001],
-    'kernel': ['rbf','linear','sigmoid','poly'],
-    'degree': [2,3,4,5]
+    'classification__C': [0.1, 1, 10, 100, 1000],
+    'classification__gamma': [1, 0.1, 0.01, 0.001, 0.0001],
+    'classification__kernel': ['rbf','linear','sigmoid','poly'],
+    'classification__degree': [2,3,4,5]
 }
 
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)

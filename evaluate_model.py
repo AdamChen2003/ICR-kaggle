@@ -12,16 +12,17 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling):
             ('sampling', SMOTE()),
             ('classification', model)
         ])
-    cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring=f1)
+    cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='neg_log_loss')
     cv.fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
     predictions = cv.best_estimator_.predict(X_test)
     print(f'Best parameters: {cv.best_params_}')
-    print(f'best score on training set: {cv.best_score_}')
     print(f'accuracy: {score}')
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
     print(f'f2 score: {fbeta_score(predictions, y_test.ravel(), beta=2)}')
     print(f'ROC AUC score: {roc_auc_score(predictions, y_test.ravel())}')
+    
+    
 
     plt.figure(figsize=(9,9))
     cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))

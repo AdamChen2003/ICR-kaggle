@@ -25,9 +25,9 @@ EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 
 # Oversampling
 grid = {
-    'criterion': ['gini', 'entropy', 'log_loss'],
-    'max_depth': [2, 3, 5, 10, 20],
-    'min_samples_leaf': [5, 10, 20, 50, 100]
+    'classification__criterion': ['gini', 'entropy', 'log_loss'],
+    'classification__max_depth': [2, 3, 5, 10, 20],
+    'classification__min_samples_leaf': [5, 10, 20, 50, 100]
 }
 
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)

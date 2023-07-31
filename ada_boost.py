@@ -23,7 +23,7 @@ for i in [1,2,3]:
 
 grid = {
     'estimator': base_models,
-    'n_estimators': [250,500,750,1000]
+    'n_estimators': [50,100,250,500]
 }
 
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
@@ -35,8 +35,8 @@ for i in [1,2,3]:
         base_models.append(DecisionTreeClassifier(max_depth=i, criterion=criteria))
 
 grid = {
-    'estimator': base_models,
-    'n_estimators': [250,500,750,1000]
+    'classification__estimator': base_models,
+    'classification__n_estimators': [50,100,250,500]
 }
 
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)
