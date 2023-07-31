@@ -19,15 +19,7 @@ grid = {
     'weights': ['uniform','distance']
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 
 # Oversampling
-oversample = SMOTE()
-X_train, y_train = oversample.fit_resample(X_train, y_train)
-
-grid = {
-    'n_neighbors': [2,4,6,8,10],
-    'weights': ['uniform','distance']
-}
-
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)

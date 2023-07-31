@@ -22,12 +22,9 @@ grid = {
     'class_weight': ['balanced', None]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 
 # Oversampling
-oversample = SMOTE()
-X_train, y_train = oversample.fit_resample(X_train, y_train)
-
 grid = {
     'C': [0.1, 1, 10, 100, 1000],
     'gamma': [1, 0.1, 0.01, 0.001, 0.0001],
@@ -35,4 +32,4 @@ grid = {
     'degree': [2,3,4,5]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)

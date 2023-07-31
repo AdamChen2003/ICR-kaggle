@@ -14,9 +14,7 @@ X_test = np.nan_to_num(X_test)
 model = GaussianNB()
 
 # No sampling
-EvaluateModel(X_train, y_train, X_test, y_test, model, {})
+EvaluateModel(X_train, y_train, X_test, y_test, model, {}, False)
 
 # Oversampling
-oversample = SMOTE()
-X_train, y_train = oversample.fit_resample(X_train, y_train)
-EvaluateModel(X_train, y_train, X_test, y_test, model, {})
+EvaluateModel(X_train, y_train, X_test, y_test, model, {}, True)

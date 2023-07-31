@@ -26,7 +26,7 @@ grid = {
     'n_estimators': [250,500,750,1000]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 
 # Oversampling
 base_models = []
@@ -34,12 +34,9 @@ for i in [1,2,3]:
     for criteria in ['gini', 'entropy', 'log_loss']:
         base_models.append(DecisionTreeClassifier(max_depth=i, criterion=criteria))
 
-oversample = SMOTE()
-X_train, y_train = oversample.fit_resample(X_train, y_train)
-
 grid = {
     'estimator': base_models,
     'n_estimators': [250,500,750,1000]
 }
 
-EvaluateModel(X_train, y_train, X_test, y_test, model, grid)
+EvaluateModel(X_train, y_train, X_test, y_test, model, grid, True)
