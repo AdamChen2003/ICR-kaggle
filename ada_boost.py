@@ -8,10 +8,7 @@ from imblearn.over_sampling import SMOTE
 
 X,y = getBinaryClassData()
 # X = pca(X)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
-X_train, X_test = Normalize(X_train, X_test)
-X_train = np.nan_to_num(X_train)
-X_test = np.nan_to_num(X_test)
+X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
 model = AdaBoostClassifier(random_state=1)
 
 # No sampling

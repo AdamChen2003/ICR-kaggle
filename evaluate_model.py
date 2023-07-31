@@ -1,17 +1,17 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, make_scorer
+from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, make_scorer
 from sklearn.model_selection import GridSearchCV
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
 
 def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling):
-    f1 = make_scorer(f1_score)
     if oversampling:
         model = Pipeline([
             ('sampling', SMOTE()),
             ('classification', model)
         ])
+    # f1 = make_scorer(f1_score)
     cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='neg_log_loss')
     cv.fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
@@ -21,8 +21,8 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling):
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
     print(f'f2 score: {fbeta_score(predictions, y_test.ravel(), beta=2)}')
     print(f'ROC AUC score: {roc_auc_score(predictions, y_test.ravel())}')
-    
-    
+    print(f'log loss: {log_loss(predictions, y_test.ravel())}')
+    print(f'brier score: {brier_score_loss(predictions, y_test.ravel())}')
 
     plt.figure(figsize=(9,9))
     cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))

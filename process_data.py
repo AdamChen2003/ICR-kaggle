@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 # Probability Ratio encoding for categorical feature EJ
@@ -87,6 +88,14 @@ def getExperimentalData():
     
     return np.array(X), np.array(y).reshape(-1,1)
 
+def splitTrainAndTest(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
+    # X_train, X_test = Normalize(X_train, X_test)
+    X_train, X_test = Standardize(X_train, X_test)
+    X_train = np.nan_to_num(X_train)
+    X_test = np.nan_to_num(X_test)
+    return X_train, y_train, X_test, y_test
+
 def pca(X):
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
@@ -100,6 +109,3 @@ def pca(X):
     pca = PCA(n_components=40)
     pca.fit(X)
     return pca.fit_transform(X)
-
-
-pca(getBinaryClassData()[0])
