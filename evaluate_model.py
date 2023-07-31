@@ -32,8 +32,9 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
             ('classification', model)
         ])
     # f1 = make_scorer(f1_score)
-    
     cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring=make_scorer(balancedLogLoss, needs_proba=True, greater_is_better=False))
+    if multi:
+        cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='f1_micro')
     # cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='neg_log_loss')
     cv.fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
@@ -45,6 +46,9 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
         score = accuracy_score(y_test, predictions)
 
     proba_predictions = cv.best_estimator_.predict_proba(X_test)
+    if multi:
+        proba_predictions = np.array([[a, b + c + d] for a, b, c, d in proba_predictions])
+
     print(f'Best parameters: {cv.best_params_}')
     print(f'accuracy: {score}')
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
