@@ -1,42 +1,53 @@
-from math import log
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, make_scorer, accuracy_score
 from sklearn.model_selection import GridSearchCV
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+def balancedLogLossScorer(clf, X, y_true):
+    y_pred = clf.predict_proba(X)
+    return balancedLogLoss(y_true, y_pred)
 
 def balancedLogLoss(y_true, y_pred):
-    N0, N1 = np.bincount(y_true)
-    class0 = np.array(np.where(y_true == 0)).ravel()
-    sum0 = 0
-    for i in class0:
-        if y_true[i] == 0:
-            p = max(min(y_pred[i], 1-10**(-15)),10**(-15))
-            sum0 += log(1-p)
-    
-    class1 = np.array(np.where(y_true == 1)).ravel()
-    sum1 = 0
-    for i in class1:
-        if y_true[i] == 1:
-            p = max(min(y_pred[i], 1-10**(-15)),10**(-15))
-            sum1 += log(p)
-    
-    return -(sum0/N0 + sum1/N1)/2
+    # calculate the number of observations for each class
+    N_0 = np.sum(1 - y_true)
+    N_1 = np.sum(y_true)
+    # calculate the weights for each class
+    w_0 = 1 / N_0
+    w_1 = 1 / N_1
+    # calculate the predicted probabilities for each class
+    p_0 = np.clip(y_pred[:, 0], 1e-15, 1 - 1e-15)
+    p_1 = np.clip(y_pred[:, 1], 1e-15, 1 - 1e-15)
+    # calculate the log loss for each class
+
+    log_loss_0 = -w_0 * np.sum((1-y_true) * np.log(p_0))
+    log_loss_1 = -w_1 * np.sum(y_true * np.log(p_1))
+    # calculate the balanced logarithmic loss
+    balanced_log_loss = (log_loss_0 + log_loss_1) / 2
+    return balanced_log_loss
 
 def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, multi=False):
     if oversampling:
         model = Pipeline([
             ('sampling', SMOTE()),
+            # ('sampling', RandomOverSampler()),
+            ('scaler', StandardScaler()),
             ('classification', model)
         ])
-    # f1 = make_scorer(f1_score)
-    cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring=make_scorer(balancedLogLoss, needs_proba=True, greater_is_better=False))
+    else:
+        model = Pipeline([
+            ('scaler', StandardScaler()),
+            ('classification', model)
+        ])
+    f1 = make_scorer(f1_score)
     if multi:
-        cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='f1_micro')
-    # cv = GridSearchCV(estimator=model, param_grid=grid, cv=5, scoring='neg_log_loss')
-    cv.fit(X_train, y_train.ravel())
+        cv = GridSearchCV(model, grid, cv=5, scoring='f1_micro').fit(X_train, y_train.ravel())
+    else:
+        cv = GridSearchCV(model, grid, cv=5, scoring=f1).fit(X_train, y_train.ravel())
+        # cv = GridSearchCV(model, grid, cv=5, scoring=balancedLogLossScorer).fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
     predictions = cv.best_estimator_.predict(X_test)
     
@@ -48,7 +59,7 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     proba_predictions = cv.best_estimator_.predict_proba(X_test)
     if multi:
         proba_predictions = np.array([[a, b + c + d] for a, b, c, d in proba_predictions])
-
+    
     print(f'Best parameters: {cv.best_params_}')
     print(f'accuracy: {score}')
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
@@ -56,7 +67,7 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     print(f'ROC AUC score: {roc_auc_score(predictions, y_test.ravel())}')
     print(f'log loss: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
     print(f'brier score: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
-    print(f'balanced log loss: {balancedLogLoss(y_test.ravel(), proba_predictions[:,1])}')
+    print(f'balanced log loss: {balancedLogLoss(y_test.ravel(), proba_predictions)}')
 
     plt.figure(figsize=(9,9))
     cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))

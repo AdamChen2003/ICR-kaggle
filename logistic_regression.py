@@ -1,17 +1,18 @@
 from sklearn.linear_model import LogisticRegression
-from process_data import getBinaryClassData, splitTrainAndTest, getMultiClassData
+from sklearn.model_selection import train_test_split
+from process_data import getBinaryClassData, getMultiClassData
 from evaluate_model import EvaluateModel
 
 X,y = getBinaryClassData()
 # X = pca(X)
-X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
 model = LogisticRegression(random_state=1)
 
 
 grid = {
-    'C': [1,0.1,0.01],
-    'fit_intercept': [True,False],
-    'class_weight': ['balanced', None]
+    'classification__C': [1,0.1,0.01],
+    'classification__fit_intercept': [True,False],
+    'classification__class_weight': ['balanced', None]
 }
 
 grid_os = {
@@ -27,7 +28,7 @@ EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid_os, True)
 
 X,y = getMultiClassData()
-X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
 
 # Multi class with no sampling
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False, multi=True)

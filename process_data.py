@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 # Probability Ratio encoding for categorical feature EJ
@@ -16,21 +15,11 @@ def PRE(val, data):
 # Count/Frequency encoding for categorical features in multi-class classification
 def CFE(val, feature, data):
     return len(data[data[feature] == val])
-    
-def Normalize(X_train, X_test):
-    scaler = MinMaxScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-    return X_train, X_test
-
-def Standardize(X_train, X_test):
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-    return X_train, X_test
-    
+        
 def getBinaryClassData():
     data = pd.read_csv('datasets/train.csv')
+    for i in data.columns[data.isnull().any(axis=0)]:
+        data[i].fillna(data[i].mean(),inplace=True)
 
     # Obtain X and y
     X = data.iloc[:,1:57]
@@ -44,7 +33,9 @@ def getBinaryClassData():
 def getMultiClassData():
     data = pd.read_csv('datasets/train.csv')
     greeks = pd.read_csv('datasets/greeks.csv')
-    
+    for i in data.columns[data.isnull().any(axis=0)]:   
+        data[i].fillna(data[i].mean(),inplace=True)
+
     classes = {'A': 0, 'B': 1, 'D': 2, 'G': 3}
     # Obtain X and y
     X = data.iloc[:,1:57]
@@ -87,14 +78,6 @@ def getExperimentalData():
     X.drop('EJ', axis=1, inplace=True)
     
     return np.array(X), np.array(y).reshape(-1,1)
-
-def splitTrainAndTest(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
-    # X_train, X_test = Normalize(X_train, X_test)
-    X_train, X_test = Standardize(X_train, X_test)
-    X_train = np.nan_to_num(X_train)
-    X_test = np.nan_to_num(X_test)
-    return X_train, y_train, X_test, y_test
 
 def pca(X):
     scaler = StandardScaler()

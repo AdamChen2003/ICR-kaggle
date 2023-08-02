@@ -1,21 +1,22 @@
 from sklearn.ensemble import RandomForestClassifier
-from process_data import getBinaryClassData, splitTrainAndTest, getMultiClassData
+from sklearn.model_selection import train_test_split
+from process_data import getBinaryClassData, getMultiClassData
 from evaluate_model import EvaluateModel
 
 X,y = getBinaryClassData()
 # X = pca(X)
-X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
 model = RandomForestClassifier()
 
 grid = {
-    'n_estimators': [200,400,800,1000],
-    'criterion': ['gini', 'entropy', 'log_loss'],
-    'max_depth': [1,3,5,7],
-    'class_weight': ['balanced', None]
+    'classification__n_estimators': [100,200,400,800],
+    'classification__criterion': ['gini', 'entropy', 'log_loss'],
+    'classification__max_depth': [1,3,5,7],
+    'classification__class_weight': ['balanced', None]
 }
 
 grid_os = {
-    'n_estimators': [200,400,800,1000],
+    'classification__n_estimators': [100,200,400,800],
     'classification__criterion': ['gini', 'entropy', 'log_loss'],
     'classification__max_depth': [1,3,5,7]
 }
@@ -27,7 +28,7 @@ EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False)
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid_os, True)
 
 X,y = getMultiClassData()
-X_train, y_train, X_test, y_test = splitTrainAndTest(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y, shuffle=True, random_state=1)
 
 # Multi class with no sampling
 EvaluateModel(X_train, y_train, X_test, y_test, model, grid, False, multi=True)
