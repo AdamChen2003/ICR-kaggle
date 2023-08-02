@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, make_scorer, accuracy_score
+from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, accuracy_score
 from sklearn.model_selection import GridSearchCV
 from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.pipeline import Pipeline
@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 def balancedLogLossScorer(clf, X, y_true):
     y_pred = clf.predict_proba(X)
-    return balancedLogLoss(y_true, y_pred)
+    return -balancedLogLoss(y_true, y_pred)
 
 def balancedLogLoss(y_true, y_pred):
     # calculate the number of observations for each class
@@ -35,19 +35,20 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
             ('sampling', SMOTE()),
             # ('sampling', RandomOverSampler()),
             ('scaler', StandardScaler()),
+            # ('scaler', MinMaxScaler()),
             ('classification', model)
         ])
     else:
         model = Pipeline([
             ('scaler', StandardScaler()),
+            # ('scaler', MinMaxScaler()),
             ('classification', model)
         ])
-    f1 = make_scorer(f1_score)
     if multi:
         cv = GridSearchCV(model, grid, cv=5, scoring='f1_micro').fit(X_train, y_train.ravel())
     else:
-        cv = GridSearchCV(model, grid, cv=5, scoring=f1).fit(X_train, y_train.ravel())
-        # cv = GridSearchCV(model, grid, cv=5, scoring=balancedLogLossScorer).fit(X_train, y_train.ravel())
+        # cv = GridSearchCV(model, grid, cv=5, scoring='f1').fit(X_train, y_train.ravel())
+        cv = GridSearchCV(model, grid, cv=5, scoring=balancedLogLossScorer).fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
     predictions = cv.best_estimator_.predict(X_test)
     
@@ -63,17 +64,14 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     print(f'Best parameters: {cv.best_params_}')
     print(f'accuracy: {score}')
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
-    print(f'f2 score: {fbeta_score(predictions, y_test.ravel(), beta=2)}')
-    print(f'ROC AUC score: {roc_auc_score(predictions, y_test.ravel())}')
     print(f'log loss: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
-    print(f'brier score: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
     print(f'balanced log loss: {balancedLogLoss(y_test.ravel(), proba_predictions)}')
 
-    plt.figure(figsize=(9,9))
-    cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))
-    sns.heatmap(cm, annot=True, fmt='.3f', linewidths=.5, square = True, cmap = 'Blues_r')
-    plt.ylabel('Actual label'),
-    plt.xlabel('Predicted label')
-    all_sample_title = 'Accuracy Score: {0}'.format(score)
-    plt.title(all_sample_title, size = 15)
+    # plt.figure(figsize=(9,9))
+    # cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))
+    # sns.heatmap(cm, annot=True, fmt='.3f', linewidths=.5, square = True, cmap = 'Blues_r')
+    # plt.ylabel('Actual label'),
+    # plt.xlabel('Predicted label')
+    # all_sample_title = 'Accuracy Score: {0}'.format(score)
+    # plt.title(all_sample_title, size = 15)
     # plt.show()
