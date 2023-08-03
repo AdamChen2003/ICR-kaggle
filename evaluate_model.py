@@ -33,7 +33,7 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     if oversampling:
         model = Pipeline([
             ('sampling', SMOTE(random_state=42)),
-            # ('sampling', RandomOverSampler()),
+            ('sampling', RandomOverSampler(random_state=42)),
             ('scaler', StandardScaler()),
             # ('scaler', MinMaxScaler()),
             ('classification', model),
