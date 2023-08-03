@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, accuracy_score
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, StratifiedShuffleSplit
+from sklearn.model_selection import GridSearchCV
 from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -32,8 +32,8 @@ def balancedLogLoss(y_true, y_pred):
 def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, multi=False):
     if oversampling:
         model = Pipeline([
-            # ('sampling', SMOTE()),
-            ('sampling', RandomOverSampler()),
+            ('sampling', SMOTE(random_state=42)),
+            # ('sampling', RandomOverSampler()),
             ('scaler', StandardScaler()),
             # ('scaler', MinMaxScaler()),
             ('classification', model),
