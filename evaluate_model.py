@@ -1,7 +1,6 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, accuracy_score
+from sklearn.metrics import f1_score, log_loss, accuracy_score
 from sklearn.model_selection import GridSearchCV
 from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.pipeline import Pipeline
@@ -32,7 +31,7 @@ def balancedLogLoss(y_true, y_pred):
 def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, multi=False):
     if oversampling:
         model = Pipeline([
-            ('sampling', SMOTE(random_state=42)),
+            # ('sampling', SMOTE(random_state=42)),
             ('sampling', RandomOverSampler(random_state=42)),
             ('scaler', StandardScaler()),
             # ('scaler', MinMaxScaler()),
@@ -45,7 +44,7 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
             ('classification', model)
         ])
     if multi:
-        cv = GridSearchCV(model, grid, cv=5, scoring='f1_micro').fit(X_train, y_train.ravel())
+        cv = GridSearchCV(model, grid, cv=5, scoring='f1_macro').fit(X_train, y_train.ravel())
     else:
         # cv = GridSearchCV(model, grid, cv=ss, scoring='f1').fit(X_train, y_train.ravel())
         cv = GridSearchCV(model, grid, cv=5, scoring=balancedLogLossScorer).fit(X_train, y_train.ravel())
@@ -66,4 +65,4 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
     print(f'log loss: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
     print(f'balanced log loss: {balancedLogLoss(y_test.ravel(), proba_predictions)}')
-    # print(cv.cv_results_)
+    print(cv.cv_results_)

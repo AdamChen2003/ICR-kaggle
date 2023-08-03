@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.decomposition import PCA
 
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
@@ -29,13 +28,17 @@ def Standardize(X_train, X_test):
 
 def getBinaryClassData():
     data = pd.read_csv('datasets/train.csv')
+
+    # Fill missing data with mean. Since it's mean of entire dataset, may be data leakage
     for i in data.columns[data.isnull().any(axis=0)]:
         data[i].fillna(data[i].mean(),inplace=True)
-    # data = data.drop(['EJ'], axis=1)
+
     # Obtain X and y
     X = data.iloc[:,1:57]
     y = data.iloc[:,57]
     
+    X[57] = X['EJ'].where()
+
     X = X.replace('A', PRE('A', data))
     X = X.replace('B', PRE('B', data))
     
@@ -89,17 +92,3 @@ def getExperimentalData():
     X.drop('EJ', axis=1, inplace=True)
     
     return np.array(X), np.array(y).reshape(-1,1)
-
-def pca(X):
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-    X = np.nan_to_num(X)
-    # pca = PCA(n_components=56)
-    # pca.fit(X)
-    # var=np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4)*100)
-    # plt.plot(var)
-    # print(var)
-    # plt.show()
-    pca = PCA(n_components=40)
-    pca.fit(X)
-    return pca.fit_transform(X)

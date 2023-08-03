@@ -39,4 +39,13 @@ X = data.iloc[:,1:57]
 X = X.replace('A', PRE_A)
 X = X.replace('B', PRE_B)
 X = StandardScaler().fit_transform(X)
-print(clf.predict_proba(X))
+data = pd.read_csv('/kaggle/input/icr-identify-age-related-conditions/test.csv')
+for i in data.columns[data.isnull().any(axis=0)]:
+    data[i].fillna(data[i].mean(),inplace=True)
+data = data.drop(['EJ'], axis=1)
+X = data.iloc[:,1:]
+X = StandardScaler().fit_transform(X)
+predictions = clf.predict_proba(X)
+sample_submission = pd.read_csv("/kaggle/input/icr-identify-age-related-conditions/sample_submission.csv")
+sample_submission[['class_0', 'class_1']] = predictions
+sample_submission.to_csv('/kaggle/working/submission.csv', index=False)
