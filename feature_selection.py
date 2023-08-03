@@ -30,7 +30,7 @@ for n in features:
             sfs.fit(X_train, y_train.ravel())
             X_train = sfs.transform(X_train)
             X_test = sfs.transform(X_test)
-            # model = RandomForestClassifier(criterion='log_loss', max_depth=7, n_estimators=800, random_state=42)
+        # model = RandomForestClassifier(criterion='log_loss', max_depth=7, n_estimators=800, random_state=42)
         # model = AdaBoostClassifier(estimator=DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=2), n_estimators=500)
         model = LogisticRegression(C=0.1,class_weight='balanced',fit_intercept=False)
         # sm = SMOTE(random_state=42)
