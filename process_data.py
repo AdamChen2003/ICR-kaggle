@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
 
 # Probability Ratio encoding for categorical feature EJ
 def PRE(val, data):
@@ -16,11 +15,23 @@ def PRE(val, data):
 def CFE(val, feature, data):
     return len(data[data[feature] == val])
         
+def Normalize(X_train, X_test):
+    scaler = MinMaxScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    return X_train, X_test
+
+def Standardize(X_train, X_test):
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    return X_train, X_test
+
 def getBinaryClassData():
     data = pd.read_csv('datasets/train.csv')
     for i in data.columns[data.isnull().any(axis=0)]:
         data[i].fillna(data[i].mean(),inplace=True)
-
+    # data = data.drop(['EJ'], axis=1)
     # Obtain X and y
     X = data.iloc[:,1:57]
     y = data.iloc[:,57]
