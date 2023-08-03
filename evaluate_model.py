@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, f1_score, fbeta_score, roc_auc_score, log_loss, brier_score_loss, accuracy_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, StratifiedShuffleSplit
 from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -32,11 +32,11 @@ def balancedLogLoss(y_true, y_pred):
 def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, multi=False):
     if oversampling:
         model = Pipeline([
-            ('sampling', SMOTE()),
-            # ('sampling', RandomOverSampler()),
+            # ('sampling', SMOTE()),
+            ('sampling', RandomOverSampler()),
             ('scaler', StandardScaler()),
             # ('scaler', MinMaxScaler()),
-            ('classification', model)
+            ('classification', model),
         ])
     else:
         model = Pipeline([
@@ -47,7 +47,7 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     if multi:
         cv = GridSearchCV(model, grid, cv=5, scoring='f1_micro').fit(X_train, y_train.ravel())
     else:
-        # cv = GridSearchCV(model, grid, cv=5, scoring='f1').fit(X_train, y_train.ravel())
+        # cv = GridSearchCV(model, grid, cv=ss, scoring='f1').fit(X_train, y_train.ravel())
         cv = GridSearchCV(model, grid, cv=5, scoring=balancedLogLossScorer).fit(X_train, y_train.ravel())
     score = cv.best_estimator_.score(X_test, y_test.ravel())
     predictions = cv.best_estimator_.predict(X_test)
@@ -66,12 +66,4 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
     print(f'log loss: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
     print(f'balanced log loss: {balancedLogLoss(y_test.ravel(), proba_predictions)}')
-
-    # plt.figure(figsize=(9,9))
-    # cm = confusion_matrix(y_test, cv.best_estimator_.predict(X_test))
-    # sns.heatmap(cm, annot=True, fmt='.3f', linewidths=.5, square = True, cmap = 'Blues_r')
-    # plt.ylabel('Actual label'),
-    # plt.xlabel('Predicted label')
-    # all_sample_title = 'Accuracy Score: {0}'.format(score)
-    # plt.title(all_sample_title, size = 15)
-    # plt.show()
+    # print(cv.cv_results_)
