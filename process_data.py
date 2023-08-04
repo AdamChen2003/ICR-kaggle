@@ -36,8 +36,6 @@ def getBinaryClassData():
     # Obtain X and y
     X = data.iloc[:,1:57]
     y = data.iloc[:,57]
-    
-    X[57] = X['EJ'].where()
 
     X = X.replace('A', PRE('A', data))
     X = X.replace('B', PRE('B', data))

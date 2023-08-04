@@ -65,4 +65,4 @@ def EvaluateModel(X_train, y_train, X_test, y_test, model, grid, oversampling, m
     print(f'f1 score: {f1_score(predictions, y_test.ravel())}')
     print(f'log loss: {log_loss(y_test.ravel(), proba_predictions[:,1])}')
     print(f'balanced log loss: {balancedLogLoss(y_test.ravel(), proba_predictions)}')
-    print(cv.cv_results_)
+    # print(cv.cv_results_)
