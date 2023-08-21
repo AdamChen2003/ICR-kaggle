@@ -9,3 +9,5 @@ The evaluate_model.py file performs grid search cross validation to tune hyperpa
 The feature_selection.py file runs feature selection on the best models and showcases the performance.
 
 The submission.py file is an testing file for the submission we made to kaggle.
+
+A summary of our experimental findings and results are displayed in the report.pdf file and the jupyter notebook.
